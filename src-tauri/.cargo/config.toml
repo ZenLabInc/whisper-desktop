@@ -1,0 +1,5 @@
+# whisper.cpp は std::filesystem を使うため macOS 10.15 以上が必要。
+# cmake サブビルド（whisper-rs-sys）に確実に伝播させるためここで明示する。
+# 非 macOS では無視される。
+[env]
+MACOSX_DEPLOYMENT_TARGET = "10.15"

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Whisper 書き起こし</title>
+    <script type="module" src="/src/main.ts" defer></script>
+  </head>
+
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <h1>Whisper 書き起こし</h1>
+        <p class="subtitle">ローカルで動く音声・動画の文字起こし</p>
+      </header>
+
+      <!-- 設定行 -->
+      <section class="controls">
+        <label class="field">
+          <span>モデル</span>
+          <select id="model-select"></select>
+        </label>
+        <label class="field">
+          <span>言語</span>
+          <select id="lang-select">
+            <option value="auto">自動判定</option>
+            <option value="ja" selected>日本語</option>
+            <option value="en">英語</option>
+            <option value="zh">中国語</option>
+            <option value="ko">韓国語</option>
+          </select>
+        </label>
+        <div id="model-status" class="model-status"></div>
+      </section>
+
+      <!-- ドロップゾーン -->
+      <section
+        id="dropzone"
+        class="dropzone"
+        role="button"
+        tabindex="0"
+        aria-label="ファイルを選択またはドロップ"
+      >
+        <div class="dz-inner">
+          <div class="dz-icon">🎙️</div>
+          <p class="dz-title" id="dz-title">
+            音声・動画ファイルをここにドロップ
+          </p>
+          <p class="dz-sub">またはクリックして選択（mp3 / m4a / wav / mp4 ほか）</p>
+        </div>
+      </section>
+
+      <!-- 進捗 -->
+      <section id="progress-area" class="progress-area hidden">
+        <div class="progress-label">
+          <span id="progress-text">準備中…</span>
+          <span id="progress-pct"></span>
+        </div>
+        <div class="progress-track">
+          <div id="progress-bar" class="progress-bar"></div>
+        </div>
+      </section>
+
+      <!-- 結果 -->
+      <section id="result-area" class="result-area hidden">
+        <div class="result-toolbar">
+          <div class="tabs">
+            <button class="tab active" data-view="text">テキスト</button>
+            <button class="tab" data-view="segments">タイムスタンプ</button>
+          </div>
+          <div class="exports">
+            <button id="export-txt" class="btn-export">.txt</button>
+            <button id="export-srt" class="btn-export">.srt</button>
+            <button id="export-vtt" class="btn-export">.vtt</button>
+            <button id="copy-btn" class="btn-export">コピー</button>
+          </div>
+        </div>
+        <div id="result-text" class="result-text"></div>
+        <div id="result-segments" class="result-segments hidden"></div>
+      </section>
+
+      <p id="toast" class="toast hidden"></p>
+    </main>
+  </body>
+</html>
