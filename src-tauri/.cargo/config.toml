@@ -7,7 +7,9 @@ MACOSX_DEPLOYMENT_TARGET = "10.15"
 # native CPU 最適化を無効化して「配布先のどの CPU でも動く」移植性のあるバイナリにする。
 # ON のままだと、ビルドマシンの CPU 命令(例: Apple Silicon の i8mm)を埋め込んでしまい
 #   - 新しい Mac でビルド → 古い M1 で起動時クラッシュ
-#   - CI で i8mm 関連のコンパイルエラー
-# が起きる。whisper.cpp が WHISPER_NATIVE → GGML_NATIVE にマップし、whisper-rs-sys が
-# WHISPER_ 接頭辞の env を cmake define へ転送するため、ここで OFF を指定できる。
-WHISPER_NATIVE = "OFF"
+#   - CI ランナー特有の i8mm 不整合でコンパイルエラー
+# が起きる。whisper.cpp の WHISPER_NATIVE→GGML_NATIVE 変換は ON 固定で OFF にできない
+# ため、cmake の CMAKE_PROJECT_INCLUDE (whisper-rs-sys が CMAKE_ 接頭辞の env を
+# cmake define へ転送する) で ggml 読み込み前に GGML_NATIVE を強制 OFF する。
+# relative=true で config.toml の場所からの相対パスを絶対パス化する。
+CMAKE_PROJECT_INCLUDE = { value = "cmake/ggml-portable.cmake", relative = true }
