@@ -1,0 +1,67 @@
+name: release
+
+# v* タグを push すると Win/Mac のインストーラをビルドして Release に添付する。
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Apple Silicon
+          - platform: macos-latest
+            target: aarch64-apple-darwin
+          # Intel Mac
+          - platform: macos-latest
+            target: x86_64-apple-darwin
+          # Windows x64
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      # whisper.cpp のビルドに CMake が必要（Windows ランナーには既定で入っている）。
+      - name: Install CMake (macOS)
+        if: startsWith(matrix.platform, 'macos')
+        run: brew install cmake || true
+
+      - name: Install frontend deps
+        run: npm ci
+
+      - name: Build app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: --target ${{ matrix.target }}
+          tagName: ${{ github.ref_name }}
+          releaseName: "Whisper 書き起こし ${{ github.ref_name }}"
+          releaseBody: "音声・動画ローカル書き起こしアプリ。各 OS 向けインストーラを添付。"
+          releaseDraft: true
+          prerelease: false
